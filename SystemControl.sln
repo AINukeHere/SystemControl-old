@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2015
+# Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemControl", "Assembly-CSharp.csproj", "{31C71171-ECC4-5876-24E9-BF1D5819F16A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemControl", "Assembly-CSharp-Editor.csproj", "{81D52C45-FE4C-8BCA-B879-892244140D80}"
