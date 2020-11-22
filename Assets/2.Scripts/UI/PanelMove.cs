@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PanelMove : MonoBehaviour, Movable
+public class PanelMove : MonoBehaviour, IMovable
 {
 
     public bool isMoving
@@ -104,11 +104,12 @@ public class PanelMove : MonoBehaviour, Movable
             isAutoMoving = true;
     }
 
-    public void Move(Vector2 pos)
+    public void Move(Vector2 pos, bool bGroup=false)
     {
         //x값 유지
         Vector2 temp = myRectTr.position;
         temp.y = pos.y;
         myRectTr.position = temp;
     }
+    public void MoveEnd(Vector2 pos, bool bGroup = false) { }
 }

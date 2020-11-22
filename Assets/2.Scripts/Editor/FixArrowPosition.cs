@@ -1,15 +1,28 @@
-﻿
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEditor;
 
-using UnityEngine;
-public class FixArrowPosition : Editor
+public class EdgePointLocalPositionSetZero : Editor
 {
-    [MenuItem("Tool/FixArrowPosition")]
+    [MenuItem("Tool/EdgePointLocalPositionSetZero")]
     static void Init()
     {
-        ArrowConnecting[] arrows = FindObjectsOfType<ArrowConnecting>();
-        foreach (ArrowConnecting arrow in arrows)
-            arrow.FixParentPosition();
+        GameObject[] objects = GameObject.FindGameObjectsWithTag("EdgePoint");
+        foreach (GameObject obj in objects)
+        {
+            obj.name = "EdgePoint";
+            obj.transform.localPosition = new Vector3(0, 0, 0);
+            SpriteRenderer[] renderers = obj.GetComponentsInChildren<SpriteRenderer>();
+            Transform parentTr = obj.transform.parent;
+            if (parentTr == null)
+                continue;
+            SpriteRenderer parentRenderer = parentTr.GetComponent<SpriteRenderer>();
+            if (parentRenderer == null)
+                continue;
+            renderers[renderers.Length - 1].color = parentTr.GetComponent<SpriteRenderer>().color;
+        }
     }
 }
 public class DotNamingWithObjectName : Editor

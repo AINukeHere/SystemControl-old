@@ -57,6 +57,12 @@ public class Controller : MonoBehaviour
     }
     void Update()
     {
+        // New Edge의 Target을 Controller로 하기로 함
+        Vector3 worldPositionMouse = nodeCamera.ScreenToWorldPoint(Input.mousePosition);
+        worldPositionMouse.z = 0;
+        transform.position = worldPositionMouse;
+
+
         AlphaChangeWithTool();
         ProcessLeftMouseClick();
         ProcessRightMouseClick();
@@ -66,14 +72,11 @@ public class Controller : MonoBehaviour
         else
             HideInfo();
 
-        if (Input.GetKeyDown(KeyCode.LeftAlt))
+        if (Input.GetKeyUp(KeyCode.LeftAlt))
             NodeManager.instance.Btn_ToogleEye();
         if (Input.GetKeyDown(KeyCode.Tab))
             panelMove.StartAutoMove();
     }
-
-
-
 
     void AlphaChangeWithTool()
     {
@@ -100,14 +103,17 @@ public class Controller : MonoBehaviour
         //ArrowInput,ArrowOutput 우선처리, 없다면 가장 마지막의 것을 채택
         foreach (Collider2D coll in overlapColls)
         {
-            Movable movableCode = coll.GetComponent<Movable>();
+            NewEdge newEdge = coll.GetComponent<NewEdge>();
+            if (newEdge != null)
+            {
+                target = coll;
+                break;
+            }
+            IMovable movableCode = coll.GetComponent<IMovable>();
             if (movableCode != null)
             {
                 target = coll;
-                if (
-                    coll.gameObject.name.StartsWith("Input") ||
-                    coll.gameObject.name.StartsWith("Output"))
-                    break;
+                break;
             }
         }
 
@@ -115,14 +121,22 @@ public class Controller : MonoBehaviour
             frameHighlighting.gameObject.SetActive(false);
         else
         {
-            frameHighlighting.gameObject.SetActive(true);
-            frameHighlighting.targetTr = target.transform;
+            NewEdge isEdge = target.GetComponent<NewEdge>();
+            if (isEdge == null)
+            {
+                frameHighlighting.gameObject.SetActive(true);
+                frameHighlighting.targetTr = target.transform;
+            }
+            //연결중인 엣지는 하이리팅하지않음.
+            else if(!isEdge.endTarget.Equals(transform))
+                isEdge.Highlighting();
         }
     }
     void ProcessLeftMouseClick()
     {
         if (Input.GetMouseButtonDown(0))
         {
+            startClickedPos = Input.mousePosition;
             //무엇을 클릭했는지 체크
             //UI기준좌표계에서 충돌체크.
             Collider2D temp0 = Physics2D.OverlapPoint(Input.mousePosition);
@@ -219,21 +233,31 @@ public class Controller : MonoBehaviour
             {
                 foreach (GameObject _selectedObject in selectedObjects)
                 {
-                    Movable movable = _selectedObject.GetComponent<Movable>();
+                    IMovable movable = _selectedObject.GetComponent<IMovable>();
                     if (movable != null)
-                        movable.isMoving = false;
+                    {
+                        if (!isUI)
+                            movable.MoveEnd((nodeCamera.ScreenToWorldPoint(Input.mousePosition) + localOffset),true);
+                        else
+                            movable.MoveEnd(Input.mousePosition + localOffset,true);
+                    }
                 }
             }
             else if (selectedObject != null)
             {
-                Movable movable = selectedObject.GetComponent<Movable>();
+                IMovable movable = selectedObject.GetComponent<IMovable>();
                 if (movable != null)
-                    movable.isMoving = false;
+                {
+                    if (!isUI)
+                        movable.MoveEnd((nodeCamera.ScreenToWorldPoint(Input.mousePosition) + localOffset));
+                    else
+                        movable.MoveEnd(Input.mousePosition + localOffset);
+                }
             }
             selectedObject = null;
         }
         //클릭되고있는 동안
-        if (Lclicked)
+        else if (Lclicked)
         {
             //선택된 오브젝트가 있다면
             if (selectedObject != null)
@@ -243,29 +267,25 @@ public class Controller : MonoBehaviour
                 {
                     for (int i = 0; i < selectedObjects.Length; ++i)
                     {
-                        Movable movable = selectedObjects[i].GetComponent<Movable>();
+                        IMovable movable = selectedObjects[i].GetComponent<IMovable>();
                         if (movable != null)
                         {
-                            movable.isMoving = true;
                             if (!isUI)
-                                movable.Move((nodeCamera.ScreenToWorldPoint(Input.mousePosition) + localOffsets[i]));
+                                movable.Move((nodeCamera.ScreenToWorldPoint(Input.mousePosition) + localOffsets[i]),true);
                             else
-                                movable.Move(Input.mousePosition + localOffsets[i]);
+                                movable.Move(Input.mousePosition + localOffsets[i],true);
                         }
                     }
                 }
                 else
                 {
-                    Movable movable = selectedObject.GetComponent<Movable>();
+                    IMovable movable = selectedObject.GetComponent<IMovable>();
                     if (movable != null)
                     {
-                        movable.isMoving = true;
                         if (!isUI)
                             movable.Move((nodeCamera.ScreenToWorldPoint(Input.mousePosition) + localOffset));
                         else
-                        {
                             movable.Move(Input.mousePosition + localOffset);
-                        }
                     }
                 }
             }
@@ -280,7 +300,8 @@ public class Controller : MonoBehaviour
                 }
             }
         }
-        startClickedPos = Input.mousePosition;
+        if(Application.isFocused)
+            startClickedPos = Input.mousePosition;
     }
     void ProcessRightMouseClick()
     {
@@ -290,8 +311,20 @@ public class Controller : MonoBehaviour
             isGetTool = false;
             ResetMultySelectSystems();
             boxLeftTopPos = nodeCamera.ScreenToWorldPoint(Input.mousePosition);
-            transform.position = (Vector2)boxLeftTopPos;
             Rclicked = true;
+            //엣지 끊기
+            touchPos = nodeCamera.ScreenToWorldPoint(Input.mousePosition);
+            Collider2D[] temps = Physics2D.OverlapPointAll(touchPos);
+            foreach (Collider2D temp in temps)
+            {
+                NewEdge edgeComponent = temp.GetComponent<NewEdge>();
+                //엣지이면서 타겟이 마우스가 아닐때(아직 마우스로 연결중이면 무시)
+                if (edgeComponent != null && !edgeComponent.endTarget.Equals(transform))
+                {
+                    EdgeManager.instance.removeEdge(edgeComponent, edgeComponent.endTarget);
+                }
+            }
+
         }
         if (Input.GetMouseButton(1))
         {
@@ -301,6 +334,8 @@ public class Controller : MonoBehaviour
             xSize = v3.x - boxLeftTopPos.x;
             ySize = v3.y - boxLeftTopPos.y;
             SelectBoxTr.localScale = new Vector3(xSize * 0.5f, ySize * 0.5f, 1);
+            Vector3 boxOffset = boxLeftTopPos - transform.position;
+            SelectBoxTr.localPosition = new Vector3(boxOffset.x, boxOffset.y,0);
 
             //LockField가 있으면 빨간색으로 표시해줌
             Collider2D[] colls = Physics2D.OverlapAreaAll(SelectBoxTr.position, SelectBoxTr.position + SelectBoxTr.lossyScale * 2);
@@ -336,7 +371,7 @@ public class Controller : MonoBehaviour
                 int movableCount = 0;
                 foreach (Collider2D coll in colls)
                 {
-                    Movable temp = coll.GetComponent<Movable>();
+                    IMovable temp = coll.GetComponent<IMovable>();
                     if (temp != null)
                         movableCount++;
                 }
@@ -346,7 +381,7 @@ public class Controller : MonoBehaviour
                 int objectIdx = 0;
                 foreach (Collider2D coll in colls)
                 {
-                    Movable temp = coll.GetComponent<Movable>();
+                    IMovable temp = coll.GetComponent<IMovable>();
                     if (temp != null)
                     {
                         selectedObjects[objectIdx] = coll.gameObject;

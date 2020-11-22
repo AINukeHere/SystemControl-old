@@ -5,6 +5,7 @@ public class PinchZoom : MonoBehaviour
     public float perspectiveZoomSpeed = 0.5f;        // The rate of change of the field of view in perspective mode.
     public float orthoZoomSpeed = 0.5f;        // The rate of change of the orthographic size in orthographic mode.
 
+    [SerializeField] private float cameraScaleMin = 1, cameraScaleMax=200;
 
     private Camera node_camera;
     private float originSize;
@@ -23,9 +24,9 @@ public class PinchZoom : MonoBehaviour
             node_camera.orthographicSize -= Input.mouseScrollDelta.y * orthoZoomSpeed;
         
             // 카메라크기최소제한
-            node_camera.orthographicSize = Mathf.Max(node_camera.orthographicSize, 1.0f);
+            node_camera.orthographicSize = Mathf.Max(node_camera.orthographicSize, cameraScaleMin);
             // 카메라크기최대제한
-            node_camera.orthographicSize = Mathf.Min(node_camera.orthographicSize, 50.0f);
+            node_camera.orthographicSize = Mathf.Min(node_camera.orthographicSize, cameraScaleMax);
 
             float scaleY = node_camera.orthographicSize / originSize;
             float scaleX = node_camera.aspect * scaleY;

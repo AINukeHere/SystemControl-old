@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIMask : MonoBehaviour, Movable
+public class UIMask : MonoBehaviour, IMovable
 {
 
 
@@ -36,7 +36,7 @@ public class UIMask : MonoBehaviour, Movable
         get;
         set;
     }
-    public void Move(Vector2 pos)
+    public void Move(Vector2 pos, bool bGroup=false)
     {
         //x값 유지
         Vector2 temp = myRectTr.position;
@@ -45,4 +45,5 @@ public class UIMask : MonoBehaviour, Movable
         bottom_line.anchoredPosition = myRectTr.anchoredPosition - new Vector2(0, deltaY);
         bottom_line.GetComponent<PanelMove>().isAutoMoving = false;
     }
+    public void MoveEnd(Vector2 pos, bool bGroup = false) { }
 }

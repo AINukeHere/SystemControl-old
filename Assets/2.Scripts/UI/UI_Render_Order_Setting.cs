@@ -13,7 +13,7 @@ public class UI_Render_Order_Setting : MonoBehaviour {
     }
     public void Sorting()
     {
-        //transform.SetSiblingIndex(orderIndex);
-        //Debug.Log(name + "'s OrderIndex : " + transform.GetSiblingIndex());
+        transform.SetSiblingIndex(orderIndex);
+        Debug.Log(name + "'s OrderIndex : " + transform.GetSiblingIndex());
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.Windows;
 using UnityEditor;
 
 public class BluePrint : EditorWindow

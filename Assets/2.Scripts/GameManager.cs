@@ -112,7 +112,7 @@ public class GameManager : MonoBehaviour
             GameObject[] all_objects = FindObjectsOfType<GameObject>();
             foreach(GameObject go in all_objects)
             {
-                ExpandableDisplay display = go.GetComponent<ExpandableDisplay>();
+                IExpandableDisplay display = go.GetComponent<IExpandableDisplay>();
                 if(display != null)
                 {
                     display.isExpanded = true;
@@ -128,7 +128,7 @@ public class GameManager : MonoBehaviour
             GameObject[] all_objects = FindObjectsOfType<GameObject>();
             foreach (GameObject go in all_objects)
             {
-                ExpandableDisplay display = go.GetComponent<ExpandableDisplay>();
+                IExpandableDisplay display = go.GetComponent<IExpandableDisplay>();
                 if (display != null)
                 {
                     display.isExpanded = false;
