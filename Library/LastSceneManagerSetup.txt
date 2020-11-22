@@ -1,9 +1,5 @@
 sceneSetups:
-<<<<<<< HEAD
-- path: Assets/1.Scenes/NewEdgeTest.unity
-=======
-- path: Assets/1.Scenes/MainMenu.unity
->>>>>>> 738b3785fe0ff6cd01f8bcd59a2bdbb5f3644c58
+- path: Assets/1.Scenes/Avoider.unity
   isLoaded: 1
   isActive: 1
   isSubScene: 0
