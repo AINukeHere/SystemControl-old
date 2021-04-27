@@ -51,13 +51,14 @@ public class EdgeManager : MonoBehaviour
     {
         foreach (var output_inputNode in edge_outputModule)
         {
-            
+            //output 노드 순환하며 해당 node의 child인지 체크
             if (output_inputNode.Value.Value.IsChildOf(node))
             {
                 output_inputNode.Key.LineRendererUpdate();
                 continue;
             }
 
+            //해당 노드의 input module과 같은 inputmodule이 있는지 체크
             foreach (var module in movingInputmodules)
             {
                 if (output_inputNode.Value.Key.Equals(module))

@@ -6,7 +6,7 @@ public class SetActiveWall : ActivatableNode,IExpandableDisplay
     public ActiveOutputModule active_output;
 
     //values
-    BigInt[] value = new BigInt[2];
+    int?[] value = new int?[2];
     bool? boolValue = null;
 
 
@@ -18,10 +18,18 @@ public class SetActiveWall : ActivatableNode,IExpandableDisplay
     public void ExpandDisplay()
     {
         if (myTextMesh)
+        {
             myTextMesh.text = "Set\nActiveWall";
+            myTextMesh.text += "\n";
+            if (value[0].HasValue)
+                myTextMesh.text += value[0].Value;
+            myTextMesh.text += "\n";
+            if (value[1].HasValue)
+                myTextMesh.text += value[1].Value;
+        }
     }
 
-    public void Input(BigInt input, int index = 0)
+    public void Input(int? input, int index = 0)
     {
         if (input != null)
         {
@@ -69,7 +77,7 @@ public class SetActiveWall : ActivatableNode,IExpandableDisplay
     {
 		if (isActive >= 2 && value[0] != null && value[1] != null && boolValue.HasValue)
         {
-            DotConnectManager.instance.SetActiveWall(value[0], value[1], boolValue.Value);
+            DotConnectManager.instance.SetActiveWall(value[0].Value, value[1].Value, boolValue.Value);
             active_output.Active();
             isActive--;
         }

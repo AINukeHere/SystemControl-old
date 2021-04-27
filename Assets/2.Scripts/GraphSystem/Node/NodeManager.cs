@@ -41,6 +41,8 @@ public class NodeManager : MonoBehaviour
         Node[] all_nodes = FindObjectsOfType<Node>();
         foreach (Node node in all_nodes)
             node.ResetNode();
+        //전체 엣지 갱신
+        EdgeManager.instance.UpdateAll();
 
 		if(TutorialManager.instance != null)
 			TutorialManager.instance.ConditionSatisfied (TutorialManager.ConditionType.RESET_NODE);

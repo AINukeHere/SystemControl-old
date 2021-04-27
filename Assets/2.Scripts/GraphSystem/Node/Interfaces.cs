@@ -91,6 +91,8 @@ public abstract class Node : MonoBehaviour, IResetable, IHasInfo, IMovable
             if (obj != null)
                 allInputModules.Add(tr);
             obj = tr.GetComponent<IInputParam<Vector3?>>();
+            if (obj != null)
+                allInputModules.Add(tr);
         }
     }
     //노드를 리셋합니다. 폴더안에 있을 땐 무시됩니다.
@@ -430,6 +432,20 @@ public abstract class OutputModule<T> : MonoBehaviour, IInputParam<T>, IMovable
         }
     }
     public abstract void AfterInputCallBack();
+    void OnDisable()
+    {
+        for (int i = 0; i < edges.Count; ++i)
+        {
+            edges[i].gameObject.SetActive(false);
+        }
+    }
+    void OnEnable()
+    {
+        for (int i = 0; i < edges.Count; ++i)
+        {
+            edges[i].gameObject.SetActive(true);
+        }
+    }
 }
 
 //변수Get 노드 부모

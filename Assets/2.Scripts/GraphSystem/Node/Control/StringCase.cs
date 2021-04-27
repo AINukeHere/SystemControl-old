@@ -44,7 +44,12 @@ public class StringCase : NotInputNotNodeActivatable,IExpandableDisplay
 	public void ExpandDisplay()
     {
         if (textMesh != null)
-            textMesh.text = case_value;
+        {
+            if (case_value != null)
+                textMesh.text = case_value;
+            else
+                textMesh.text = "값없음";
+        }
 	}
 	public void SetSwitchHead(SwitchOnString head)
 	{

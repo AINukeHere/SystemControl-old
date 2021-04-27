@@ -111,7 +111,7 @@ public class DotConnectManager : MonoBehaviour
         if(run)
         {
             run = false;
-            SetActiveWall((BigInt)dot1Idx, (BigInt)dot2Idx, bActive);
+            SetActiveWall(dot1Idx, dot2Idx, bActive);
         }
     }
     //****************디버깅용*****************//
@@ -142,12 +142,11 @@ public class DotConnectManager : MonoBehaviour
                 SetActiveWall(dot_StageDefault[currentStageNum].dot_Defaults[i]);
         }
     }
-    public void SetActiveWall(BigInt dot1, BigInt dot2, bool bActive)
+    public void SetActiveWall(int dot1, int dot2, bool bActive)
     {
-		Debug.Log (dot1.ToString () + "과 " + dot2.ToString () + "을 이어라");
         GameObject Dot1Obj, Dot2Obj;
-        Dot1Obj = GameObject.Find("Dot" + (int)dot1);
-        Dot2Obj = GameObject.Find("Dot" + (int)dot2);
+        Dot1Obj = GameObject.Find("Dot" + dot1);
+        Dot2Obj = GameObject.Find("Dot" + dot2);
         //점두개가 실제로 있을 때만 벽이 생기네마네 함
         if (Dot1Obj != null && Dot2Obj != null)
         {
