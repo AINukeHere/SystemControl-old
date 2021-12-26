@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 [System.Serializable]
 public class FloatParamEvent : UnityEvent<float?,int> { }
-public class FloatInputModule : MonoBehaviour, IInputParam<float?>
+public class FloatInputModule : ModuleColorize, IInputParam<float?>
 {
     [SerializeField]
     public FloatParamEvent destination;

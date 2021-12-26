@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 [System.Serializable]
 public class Vector3ParamEvent : UnityEvent<Vector3?,int> { }
-public class Vector3InputModule : MonoBehaviour, IInputParam<Vector3?>
+public class Vector3InputModule : ModuleColorize, IInputParam<Vector3?>
 {
     [SerializeField]
     public Vector3ParamEvent destination;

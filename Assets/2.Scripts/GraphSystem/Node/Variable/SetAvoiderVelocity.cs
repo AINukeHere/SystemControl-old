@@ -19,11 +19,11 @@ public class SetAvoiderVelocity : SetVariable<Vector2?>
     public override void CheckOutput()
     {
         if (gameObject.name.EndsWith("(Test)"))
-            Debug.Log("SetAvoiderVelocity CheckOutput()");
+            Debug.Log($"{name} CheckOutput()");
         if (isActive >= 2 && value != null)
         {
             if (gameObject.name.EndsWith("(Test)"))
-                Debug.Log("SetAvoiderVelocity CheckOutput() : " + value.Value);
+                Debug.Log($"{name} CheckOutput() : " + value.Value);
             AvoiderRigid2D.velocity = value.Value;
             vector2_output.Input(AvoiderRigid2D.velocity);
             active_output.Active();

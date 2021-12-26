@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 [System.Serializable]
 public class ActiveParamEvent : UnityEvent<ActivateType?, int> { }
-public class ActiveInputModule : MonoBehaviour, IInputParam<ActivateType?>
+public class ActiveInputModule : ModuleColorize, IInputParam<ActivateType?>
 {
     [SerializeField]
     public ActiveParamEvent destination;

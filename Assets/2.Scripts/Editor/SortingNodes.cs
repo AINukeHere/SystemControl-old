@@ -37,14 +37,54 @@ public class SortingNodes : Editor
             foreach (SpriteRenderer spriteRenderer in spriteRenderers)
             {
                 spriteRenderer.sortingLayerName = "Node";
-                spriteRenderer.sortingOrder = nodeOrder++;
-                Debug.Log(node.gameObject.name + "'s "+ spriteRenderer.gameObject.name + " = " + nodeOrder);
+                spriteRenderer.sortingOrder = ++nodeOrder;
+                Debug.Log(node.gameObject.name + "'s " + spriteRenderer.gameObject.name + " = " + nodeOrder);
             }
+
+            // 스프라이트 처리시 상수노드의 경우 마스킹 문제로 order는 node sprite < node mask < edgePoint sprite < edgePoint mask가 되어야함.
+            if (node is GetVariable)
+            {
+                SpriteMask[] spriteMasks = node.GetComponentsInChildren<SpriteMask>();
+                List<SpriteRenderer> spriteRenderersInMasksChildren = new List<SpriteRenderer>();
+                foreach (SpriteMask spriteMask in spriteMasks)
+                {
+                    spriteMask.isCustomRangeActive = true;
+                    spriteMask.frontSortingLayerID = SortingLayer.NameToID("Node");
+                    spriteMask.frontSortingOrder = ++nodeOrder;
+                    Debug.Log(node.gameObject.name + "'s " + spriteMask.gameObject.name + " = " + nodeOrder);
+
+                    spriteRenderersInMasksChildren.AddRange(spriteMask.GetComponentsInChildren<SpriteRenderer>());
+                }
+                foreach (SpriteRenderer spriteRenderer in spriteRenderersInMasksChildren)
+                {
+                    spriteRenderer.sortingLayerName = "Node";
+                    spriteRenderer.sortingOrder = ++nodeOrder;
+                    Debug.Log(node.gameObject.name + "'s " + spriteRenderer.gameObject.name + " = " + nodeOrder);
+
+                    SpriteMask[] spriteMasksInSprite = spriteRenderer.GetComponentsInChildren<SpriteMask>();
+                    foreach (SpriteMask spriteMask in spriteMasksInSprite)
+                    {
+                        spriteMask.isCustomRangeActive = false;
+                    }
+                }
+            }
+            else
+            {
+                SpriteMask[] spriteMasks = node.GetComponentsInChildren<SpriteMask>();
+                foreach (SpriteMask spriteMask in spriteMasks)
+                {
+                    spriteMask.isCustomRangeActive = true;
+                    spriteMask.frontSortingLayerID = SortingLayer.NameToID("Node");
+                    spriteMask.frontSortingOrder = ++nodeOrder;
+                    Debug.Log(node.gameObject.name + "'s " + spriteMask.gameObject.name + " = " + nodeOrder);
+                }
+            }
+
             MeshRenderer[] meshRenderers = node.GetComponentsInChildren<MeshRenderer>();
             foreach (MeshRenderer meshRenderer in meshRenderers)
             {
                 meshRenderer.sortingLayerName = "Node";
-                meshRenderer.sortingOrder = nodeOrder++;
+                meshRenderer.sortingOrder = ++nodeOrder;
                 Debug.Log(node.gameObject.name + "'s " + meshRenderer.gameObject.name + " = " + nodeOrder);
             }
             Transform[] transforms = node.GetComponentsInChildren<Transform>();

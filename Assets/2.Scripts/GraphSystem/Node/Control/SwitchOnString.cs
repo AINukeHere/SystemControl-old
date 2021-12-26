@@ -107,6 +107,7 @@ public class SwitchOnString : ActivatableNode
     {
         if(cases.Count > 0)
         {
+            EdgeManager.instance.RemoveEdgeFromStringCase(cases[cases.Count - 1]);
             Destroy(cases[cases.Count - 1].gameObject);
             cases.RemoveAt(cases.Count - 1);
         }

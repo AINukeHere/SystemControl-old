@@ -5,7 +5,10 @@ using UnityEngine;
 
 public class NewEdge : MonoBehaviour
 {
+    public static bool AlwaysUpdateLine = false;
+    [SerializeField]
     private Transform _startTarget,_endTarget;
+    public bool bDestroyed { get; private set; }
     public Transform startTarget
     {
         get { return _startTarget; }
@@ -39,6 +42,7 @@ public class NewEdge : MonoBehaviour
         transform.localScale = new Vector3(1 / transform.lossyScale.x, 1 / transform.lossyScale.y, 1 / transform.lossyScale.z);
 
         SetNormalEdgeSize();
+        bDestroyed = false;
     }
     public void Update()
     {
@@ -46,7 +50,8 @@ public class NewEdge : MonoBehaviour
             bHighlighting -= 1;
         if (bHighlighting == 1)
             SetNormalEdgeSize();
-        //LineRendererUpdate();
+        if(NewEdge.AlwaysUpdateLine)
+            LineRendererUpdate();
     }
     public void LineRendererUpdate()
     {
@@ -82,18 +87,19 @@ public class NewEdge : MonoBehaviour
     public void Highlighting()
     {
         bHighlighting = 3;
-        lineRenderer.startWidth = 0.75f;
-        lineRenderer.endWidth = 0.75f;
+        lineRenderer.startWidth = 0.5f;
+        lineRenderer.endWidth = 0.5f;
     }
     public void SetNormalEdgeSize()
     {
-        lineRenderer.startWidth = 0.5f;
-        lineRenderer.endWidth = 0.5f;
+        lineRenderer.startWidth = 0.25f;
+        lineRenderer.endWidth = 0.25f;
     }
     public void SetStartTarget<T>(OutputModule<T> outputModule)
     {
         startTarget = outputModule.transform;
-        lineRenderer.startColor = outputModule.nodeColor;
+        lineRenderer.startColor = outputModule.initializedModuleColor;
+        lineRenderer.endColor = outputModule.initializedModuleColor;
     }
     public void SetEndTarget(Transform endTr)
     {
@@ -104,8 +110,24 @@ public class NewEdge : MonoBehaviour
     {
         lineRenderer.sortingLayerName = "Default";
         lineRenderer.sortingOrder = NewEdge.sortingOrder++;
-        Debug.Log("edge sortingOrder = " + NewEdge.sortingOrder);
+        //Debug.Log("edge sortingOrder = " + NewEdge.sortingOrder);
         //lineRenderer.sortingLayerName = sortingLayerName;
         //lineRenderer.sortingOrder = sortingOrder;
+    }
+    //Destory호출된 상태에서 접근하지못하기위해 별도의 메소드로 삭제
+    public void DestroySelf()
+    {
+        if (!bDestroyed)
+        {
+            bDestroyed = true;
+            Destroy(gameObject);
+            Debug.Log("Edge  Destroy Self called.");
+        }
+    }
+    private void OnDestroy()
+    {
+        if (!bDestroyed)
+            Debug.LogWarning("Edge was destroyed by illegal way");
+        bDestroyed = true;
     }
 }

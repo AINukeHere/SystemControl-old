@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 [System.Serializable]
 public class BoolParamEvent : UnityEvent<bool?,int> { }
-public class BoolInputModule : MonoBehaviour, IInputParam<bool?>
+public class BoolInputModule : ModuleColorize, IInputParam<bool?>
 {
     [SerializeField]
     public BoolParamEvent destination;

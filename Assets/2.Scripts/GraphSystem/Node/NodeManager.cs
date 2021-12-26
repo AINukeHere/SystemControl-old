@@ -5,9 +5,25 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum ModuleValueType
+{
+    ACTIVE,
+    INT,
+    FLOAT,
+    STRING,
+    VECTOR2,
+    VECTOR3,
+    BOOL,
+    AUDIO_CLIP,
+    AUDIO_SOURCE,
+    COMPONENT,
+
+    MAX
+}
 public class NodeManager : MonoBehaviour
 {
     public static NodeManager instance { get; private set; }
+    private Color[] typeColorInfo;
     void Awake()
     {
         if (instance == null)
@@ -16,9 +32,24 @@ public class NodeManager : MonoBehaviour
         }
         else
 			Destroy(gameObject);
-		_isExpandDisplay = false;
-		toogleEyeImg.sprite = eye_closed_img;
+        NodeManager.instance.CheckNodeToReoutput();
+        isExpandDisplay = false;
+		if(toogleEyeImg != null)
+            toogleEyeImg.sprite = eye_closed_img;
 		StartCoroutine (UpdateNodeWithEyeState ());
+
+        //모듈 타입별 색상 관리
+        typeColorInfo = new Color[(int)ModuleValueType.MAX];
+        typeColorInfo[(int)ModuleValueType.ACTIVE] = Color.white;
+        typeColorInfo[(int)ModuleValueType.INT] = new Color32(30, 226, 174, 255);
+        typeColorInfo[(int)ModuleValueType.FLOAT] = Color.green;
+        typeColorInfo[(int)ModuleValueType.STRING] = Color.magenta;
+        typeColorInfo[(int)ModuleValueType.VECTOR2] = new Color32(231, 182, 35, 255);
+        typeColorInfo[(int)ModuleValueType.VECTOR3] = new Color32(231, 182, 35, 255);
+        typeColorInfo[(int)ModuleValueType.BOOL] = Color.red;
+        typeColorInfo[(int)ModuleValueType.AUDIO_CLIP] = new Color32(128, 64, 0, 255);
+        typeColorInfo[(int)ModuleValueType.AUDIO_SOURCE] = new Color32(0, 168, 242, 255);
+        typeColorInfo[(int)ModuleValueType.COMPONENT] = new Color32(0, 168, 242, 255);
     }
 
     //상수및 변수노드는 한 노드에서 한프레임에 여러번 출력할때 같이 재출력해야함.
@@ -37,33 +68,42 @@ public class NodeManager : MonoBehaviour
     }
     public void Btn_ResetNodes()
     {
+        //전체 엣지 삭제
+        EdgeManager.instance.RemoveAllEdge();
+
         //노드초기화
         Node[] all_nodes = FindObjectsOfType<Node>();
         foreach (Node node in all_nodes)
             node.ResetNode();
-        //전체 엣지 갱신
-        EdgeManager.instance.UpdateAll();
+        //모든 OutputModule에서 CreateDefaultEdges 호출
+        List<Component> modules = new List<Component>();
+        modules.AddRange(FindObjectsOfType<ActiveOutputModule>());
+        modules.AddRange(FindObjectsOfType<AudioClipOutputModule>());
+        modules.AddRange(FindObjectsOfType<BoolOutputModule>());
+        modules.AddRange(FindObjectsOfType<FloatOutputModule>());
+        modules.AddRange(FindObjectsOfType<IntOutputModule>());
+        modules.AddRange(FindObjectsOfType<StringOutputModule>());
+        modules.AddRange(FindObjectsOfType<Vector2OutputModule>());
+        modules.AddRange(FindObjectsOfType<Vector3OutputModule>());
+        foreach (var module in modules)
+            module.SendMessage("CreateDefaultEdges");
 
-		if(TutorialManager.instance != null)
+        //EdgeManager.instance.UpdateAll();
+
+        if (TutorialManager.instance != null)
 			TutorialManager.instance.ConditionSatisfied (TutorialManager.ConditionType.RESET_NODE);
     }
 	public Image toogleEyeImg;
-	private bool _isExpandDisplay;
-	public bool isExpandDisplay
-	{
-		get
-		{
-			return _isExpandDisplay;
-		}
-	}
-	public Sprite eye_closed_img;
+    public bool isExpandDisplay { get; private set; }
+    public Sprite eye_closed_img;
 	public Sprite eye_opened_img;
 	public void Btn_ToogleEye()
 	{
-		_isExpandDisplay = !_isExpandDisplay;
+		isExpandDisplay = !isExpandDisplay;
 
 		//이미지 교체
-		toogleEyeImg.sprite = isExpandDisplay ? eye_opened_img : eye_closed_img;
+        if (toogleEyeImg != null)
+		    toogleEyeImg.sprite = isExpandDisplay ? eye_opened_img : eye_closed_img;
 
 		//확장형 디스플레이에서 확장디스플레이 호출
 		CallDisplay();
@@ -72,7 +112,9 @@ public class NodeManager : MonoBehaviour
 	{
 		Node[] all_nodes = FindObjectsOfType<Node>();
 		StringCase[] all_case = FindObjectsOfType<StringCase>();
-		for (int i = 0; i < all_nodes.Length; ++i)
+        int max_count = all_nodes.Length < all_case.Length ? all_case.Length : all_nodes.Length;
+
+        for (int i = 0; i < max_count; ++i)
 		{
 			Node node = null;
 			StringCase stringCase = null;
@@ -126,5 +168,10 @@ public class NodeManager : MonoBehaviour
         Debug.Log(all_nodes.Length + "개의 노드 비활성화");
         foreach (Node node in all_nodes)
             node.gameObject.SetActive(false);
+    }
+
+    public Color getTypeColor(ModuleValueType valueType)
+    {
+        return typeColorInfo[(int)valueType];
     }
 }

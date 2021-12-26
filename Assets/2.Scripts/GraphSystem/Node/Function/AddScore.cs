@@ -53,7 +53,7 @@ public class AddScore : ActivatableNode,IExpandableDisplay
     {
         if (isActive >= 2 && value != null)
         {
-            GameManager.instance.AddScore(value);
+            ScoreGameManager.instance.AddScore(value);
             DisappearText text = Instantiate(disappearText, transform.position, Quaternion.identity).GetComponent<DisappearText>();
             text.text = value.ToString();
             value = null;

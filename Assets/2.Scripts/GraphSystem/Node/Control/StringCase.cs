@@ -5,7 +5,7 @@ public class StringCase : NotInputNotNodeActivatable,IExpandableDisplay
 {
     public string case_value;
     public ActiveOutputModule active_output;
-    public TextMesh textMesh;
+    private TextMesh textMesh;
 
 	//stringCase에 값이 들어올 때마다 SwitchOnString의 CheckOutput 호출
 	private  SwitchOnString myHead;

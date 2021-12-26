@@ -19,27 +19,29 @@ public class AvoiderCollision : Event,IExpandableDisplay
         else
             Debug.LogWarning("avoider not found");
     }
+    string collTags;
     public override void Update()
     {
         base.Update();
         if (isActive >= 1)
             isActive--;
-        string updateText;
         if (isExpanded)
-            updateText = "AvoiderCollision\n";
+            collTags = "AvoiderCollision\n";
 		else
-			updateText = "AvoiderCollision\n\nTag";
+			collTags = "AvoiderCollision\n\nTag";
         Transform real_avoider_model = AvoiderTr.GetChild(0);
 
         Collider2D[] colls;// = new Collider2D[10];
         //int colliderCount = AvoiderTr.GetComponentInChildren<Collider2D>().OverlapCollider(new ContactFilter2D(), colls);
         colls = Physics2D.OverlapAreaAll(real_avoider_model.position - real_avoider_model.lossyScale, real_avoider_model.position + real_avoider_model.lossyScale);
+        bool bExistCollider = false;
         for (int i = 0,count = 0; i< colls.Length; ++i)
         {
             Collider2D coll = colls[i];
             if (!(coll.transform.IsChildOf(AvoiderTr) || coll.transform == AvoiderTr))
             {
-                //상수,변수,ArrowInput의 재활성화와 재전송가능하게 변경
+                bExistCollider = true;
+                //상수,변수의 신호를 재전송
                 if (count != 0)
                     NodeManager.instance.ProcessNodeToReoutput();
 
@@ -47,13 +49,14 @@ public class AvoiderCollision : Event,IExpandableDisplay
                 string_output.Input(coll.tag);
                 active_output.Active();
                 Active();
-                if (isExpanded)
-                    updateText += (coll.tag + "\n");
+                collTags += (coll.tag + "\n");
             }
         }
+        if (isExpanded && !bExistCollider)
+            collTags += "값없음";
         if (textMesh != null)
         {
-            textMesh.text = updateText;
+            textMesh.text = collTags;
         }
     }
     public bool isExpanded
@@ -69,18 +72,18 @@ public class AvoiderCollision : Event,IExpandableDisplay
     {
         if (textMesh != null)
         {
-            textMesh.text = "AvoiderCollision\n";
-            Transform real_avoider_model = AvoiderTr.GetChild(0);
-            Collider2D[] colls;// = Physics2D.OverlapAreaAll(AvoiderTr.position - AvoiderTr.lossyScale, AvoiderTr.position + AvoiderTr.lossyScale);
-            colls = Physics2D.OverlapAreaAll(real_avoider_model.position - real_avoider_model.lossyScale, real_avoider_model.position + real_avoider_model.lossyScale);
-            for (int i = 0; i < colls.Length; ++i)
-            {
-                Collider2D coll = colls[i];
-                if (!(coll.transform.IsChildOf(AvoiderTr) || coll.transform == AvoiderTr))
-                {
-                    textMesh.text += (coll.tag + "\n");
-                }
-            }
+            textMesh.text = "AvoiderCollision\n" + collTags;
+            //Transform real_avoider_model = AvoiderTr.GetChild(0);
+            //Collider2D[] colls;// = Physics2D.OverlapAreaAll(AvoiderTr.position - AvoiderTr.lossyScale, AvoiderTr.position + AvoiderTr.lossyScale);
+            //colls = Physics2D.OverlapAreaAll(real_avoider_model.position - real_avoider_model.lossyScale, real_avoider_model.position + real_avoider_model.lossyScale);
+            //for (int i = 0; i < colls.Length; ++i)
+            //{
+            //    Collider2D coll = colls[i];
+            //    if (!(coll.transform.IsChildOf(AvoiderTr) || coll.transform == AvoiderTr))
+            //    {
+            //        textMesh.text += (coll.tag + "\n");
+            //    }
+            //}
         }
     }
     public override string GetInfoString()

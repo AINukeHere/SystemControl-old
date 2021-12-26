@@ -19,13 +19,11 @@ public class SetActiveWall : ActivatableNode,IExpandableDisplay
     {
         if (myTextMesh)
         {
-            myTextMesh.text = "Set\nActiveWall";
-            myTextMesh.text += "\n";
-            if (value[0].HasValue)
-                myTextMesh.text += value[0].Value;
-            myTextMesh.text += "\n";
-            if (value[1].HasValue)
-                myTextMesh.text += value[1].Value;
+            myTextMesh.text = "Set\nActiveWall\n";
+
+            myTextMesh.text += $"{(value[0].HasValue ? value[0].Value.ToString() : "값없음")}\n";
+            myTextMesh.text += $"{(value[1].HasValue ? value[1].Value.ToString() : "값없음")}\n";
+            myTextMesh.text += $"{(boolValue.HasValue ? boolValue.Value.ToString() : "값없음")}\n";
         }
     }
 

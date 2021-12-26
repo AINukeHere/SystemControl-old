@@ -3,8 +3,6 @@
 public class AvoiderReset : ActivatableNode
 {
     private TextMesh myTextMesh;
-
-    public GameObject disappearText;
     private Transform avoiderTr;
 
     public ActiveOutputModule active_output;
@@ -35,6 +33,8 @@ public class AvoiderReset : ActivatableNode
         if (isActive >= 2)
         {
             avoiderTr.position = AvoidGameManager.instance.GetStartPosition();
+            avoiderTr.localScale = Vector3.one;
+            avoiderTr.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
             active_output.Active();
             isActive--;
         }
@@ -42,6 +42,6 @@ public class AvoiderReset : ActivatableNode
 
     public override string GetInfoString()
     {
-        return "Avoider의 위치를 시작위치로 초기화시킵니다.";
+        return "Avoider의 위치, 크기, 속도를 초기화시킵니다.";
     }
 }

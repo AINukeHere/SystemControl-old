@@ -74,10 +74,7 @@ public class Brench : ActivatableNode, IExpandableDisplay
     {
         if (myTextMesh != null)
         {
-            if (value != null)
-                myTextMesh.text = "Brench" + (isExpanded ? "\n" + value.ToString() : "");
-            else
-                myTextMesh.text = "Brench";
+            myTextMesh.text = $"Brench\n{(value.HasValue ? value.ToString() : "값없음")}";
         }
     }
     public override string GetInfoString()

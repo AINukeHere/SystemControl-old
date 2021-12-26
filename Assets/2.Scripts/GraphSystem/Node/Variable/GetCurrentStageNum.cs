@@ -10,7 +10,7 @@ public class GetCurrentStageNum : GetVariable
 
     public override void CheckOutput()
     {
-        int_output.Input(AvoidGameManager.instance.GetCurrentStageNum(gameObject));
+        int_output.Input(AvoidGameManager.instance?.GetCurrentStageNum(gameObject));
     }
     public override string GetInfoString()
     {

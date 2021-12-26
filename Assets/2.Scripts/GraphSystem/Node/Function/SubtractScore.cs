@@ -52,7 +52,7 @@ public class SubtractScore : ActivatableNode,IExpandableDisplay
     {
         if (isActive >= 2 && value != null)
         {
-            GameManager.instance.SubtractScore(value);
+            ScoreGameManager.instance.SubtractScore(value);
             DisappearText text = Instantiate(disappearText, transform.position, Quaternion.identity).GetComponent<DisappearText>();
             text.text = (-value).ToString();
             value = null;

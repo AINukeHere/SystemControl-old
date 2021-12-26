@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 [System.Serializable]
 public class AudioClipParamEvent : UnityEvent<AudioClip,int> { }
-public class AudioClipInputModule : MonoBehaviour, IInputParam<AudioClip>
+public class AudioClipInputModule : ModuleColorize, IInputParam<AudioClip>
 {
     public AudioClipParamEvent destination;
     [SerializeField]

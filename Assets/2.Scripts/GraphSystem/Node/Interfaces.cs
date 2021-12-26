@@ -37,6 +37,23 @@ public interface IInputParam<T>
 {
     void Input(T input);
 }
+//모든 Module이 상속받습니다.
+[RequireComponent(typeof(SpriteRenderer))]
+public class ModuleColorize : MonoBehaviour
+{
+    SpriteRenderer spriteRenderer;
+    [SerializeField] private ModuleValueType valueTypeFoColorize;
+    protected virtual void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        Colorize();
+    }
+    public void Colorize()
+    {
+        if(spriteRenderer != null)
+            spriteRenderer.color = NodeManager.instance.getTypeColor(valueTypeFoColorize);
+    }
+}
 //눈 아이콘을 눌러서 세부적인 정보를 출력할 수 있는 인퍼에시으입니다.
 public interface IExpandableDisplay
 {
@@ -95,7 +112,7 @@ public abstract class Node : MonoBehaviour, IResetable, IHasInfo, IMovable
                 allInputModules.Add(tr);
         }
     }
-    //노드를 리셋합니다. 폴더안에 있을 땐 무시됩니다.
+    
     public virtual void ResetNode()
     {
         //부모가 없을 때만 리셋 (폴더아래에 있을땐 무반응)
@@ -152,6 +169,37 @@ public abstract class ActivatableNode : Node
             temp.a = 0.5f;
         myRenderer.color = temp;
     }
+
+}
+//연산자 노드가 아닌 실행신호가 없는 노드클래스 = Object에 대한 Method node (ex. isPlayingAudioSource, PlayAudioSource)
+public abstract class MethodNode : Node, IExpandableDisplay
+{
+    protected SpriteRenderer myRenderer;
+    public abstract bool CheckRuningState();
+    public override void Awake()
+    {
+        base.Awake();
+        myRenderer = GetComponent<SpriteRenderer>();
+    }
+    public virtual void Update()
+    {
+        Color temp = myRenderer.color;
+        if (CheckRuningState())
+            temp.a = 1;
+        else
+            temp.a = 0.5f;
+        myRenderer.color = temp;
+
+        //IExpandableDisplay
+        if (isExpanded)
+            ExpandDisplay();
+        else
+            NormalDisplay();
+    }
+    //IExpandableDisplay 구현
+    public bool isExpanded { get; set; }
+    public abstract void NormalDisplay();
+    public abstract void ExpandDisplay();
 
 }
 //ArrowOutput이 Active시키지 않고 노드가 아닌 활성화클래스 (SwitchCase, Folder)
@@ -229,8 +277,6 @@ public abstract class Operator<T, R> : Node, IExpandableDisplay
             if (gameObject.name.EndsWith("(Test)"))
                 Debug.Log("Operator CheckOutput() : " + input.ToString());
             this.input[idx] = input;
-            for(int i =0; i < result.Length; ++i)
-                result[i] = default;
             CheckOutput();
         }
     }
@@ -276,7 +322,7 @@ public abstract class InputModule<T> : MonoBehaviour, InputParam<T>
 */
 
 //OutputModule 부모
-public abstract class OutputModule<T> : MonoBehaviour, IInputParam<T>, IMovable
+public abstract class OutputModule<T> : ModuleColorize, IInputParam<T>, IMovable
 {
     private GameObject edgePrefab;
     [SerializeField] private List<NewEdge> edges;
@@ -284,16 +330,18 @@ public abstract class OutputModule<T> : MonoBehaviour, IInputParam<T>, IMovable
     [SerializeField]
     private static float autoAssignRadius = 0.5f;
     [SerializeField] protected List<IInputParam<T>> connectedInputModules = new List<IInputParam<T>>();
+    [Tooltip("미리 연결되어있도록 설정합니다. InputModule의 Transform을 등록")]
     [SerializeField] private Transform[] defaultEdge;
-    public Color nodeColor;
+    public Color initializedModuleColor;
     //protected bool isCheckOutput = false;
     protected T input;
-    protected virtual void Awake()
+
+    protected override void Awake()
     {
+        base.Awake();
         edgePrefab = Resources.Load<GameObject>("NewEdge");
-        nodeColor = GetComponentInParent<SpriteRenderer>().color;
-        foreach(Transform targetTr in defaultEdge)
-            CreateEdge(targetTr);
+        initializedModuleColor = GetComponentInParent<SpriteRenderer>().color;
+        CreateDefaultEdges();
     }
     public virtual void Input(T input)
     {
@@ -339,11 +387,13 @@ public abstract class OutputModule<T> : MonoBehaviour, IInputParam<T>, IMovable
     }
     public virtual void MoveEnd(Vector2 pos, bool bGroup=false)
     {
+        Debug.Log("MoveEnd : " + gameObject.name);
         if (bGroup)
             return;
         bool bFoundInputModule = false;  //colls에서 InputNode를 찾았는지 체크
         Collider2D[] colls;
         colls = Physics2D.OverlapCircleAll(pos, autoAssignRadius);
+        Debug.Log(colls.Length);
         if (colls.Length > 0)
         {
             int min_dist_idx = -1;
@@ -390,7 +440,7 @@ public abstract class OutputModule<T> : MonoBehaviour, IInputParam<T>, IMovable
         if (!bFoundInputModule)
         {
             edges.Remove(currentEdge);
-            Destroy(currentEdge.gameObject);
+            currentEdge.DestroySelf();
             currentEdge = null;
         }
 
@@ -419,9 +469,14 @@ public abstract class OutputModule<T> : MonoBehaviour, IInputParam<T>, IMovable
             Destroy(currentEdge.gameObject);
         }
     }
-    public virtual void RemoveEdge(Transform edgeTr)
+    /// <summary>
+    /// SendMessage로 호출됨
+    /// </summary>
+    /// <param name="endTr"></param>
+    public virtual void RemoveEdge(Transform endTr)
     {
-        IInputParam<T> inputParamT = edgeTr.GetComponent<IInputParam<T>>();
+
+        IInputParam<T> inputParamT = endTr.GetComponent<IInputParam<T>>();
         for (int i=0; i < connectedInputModules.Count; ++i)
         {
             if (connectedInputModules[i].Equals(inputParamT))
@@ -430,20 +485,29 @@ public abstract class OutputModule<T> : MonoBehaviour, IInputParam<T>, IMovable
                 break;
             }
         }
+        Debug.Log("Removed : " + endTr.gameObject.name);
     }
+    
     public abstract void AfterInputCallBack();
+    public void CreateDefaultEdges()
+    {
+        foreach (Transform targetTr in defaultEdge)
+            CreateEdge(targetTr);
+    }
     void OnDisable()
     {
         for (int i = 0; i < edges.Count; ++i)
         {
-            edges[i].gameObject.SetActive(false);
+            if(!edges[i].bDestroyed)
+                edges[i].gameObject.SetActive(false);
         }
     }
     void OnEnable()
     {
         for (int i = 0; i < edges.Count; ++i)
         {
-            edges[i].gameObject.SetActive(true);
+            if (!edges[i].bDestroyed)
+                edges[i].gameObject.SetActive(true);
         }
     }
 }
