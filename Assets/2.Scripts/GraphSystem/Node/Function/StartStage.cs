@@ -15,37 +15,18 @@ public class StartStage : ActivatableNode
             CheckOutput();
         }
     }
-
-    public override void Active()
-    {
-        base.Active();
-        CheckOutput();
-    }
-
-    public override void Awake()
-    {
-        base.Awake();
-        value = null;
-        
-        myRenderer = GetComponent<SpriteRenderer>();
-    }
-
     public override void Update()
     {
         base.Update();
-
-        if (isActive >= 1)
-        {
-            //CheckOutput();
-            isActive--;
-        }
         value = null;
     }
     public override void CheckOutput()
     {
         if (isActive >= 2 && value != null)
         {
+#if UNITY_EDITOR
             Debug.Log("StageStart(" + value.ToString() + ")");
+#endif
             AvoidGameManager.instance.StartStage(value.Value);
             DisappearText text = Instantiate(disappearText, transform.position, Quaternion.identity).GetComponent<DisappearText>();
             text.text = value.ToString();
@@ -55,8 +36,8 @@ public class StartStage : ActivatableNode
         }
     }
 
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "입력된 값의 스테이지를 시작합니다.";
+        textMesh.text = $"{nodeName}\n{value}";
     }
 }

@@ -12,8 +12,8 @@ public class GetDeltaTime : GetVariable
     {
         float_output.Input(Time.deltaTime);
     }
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "이전프레임에서 현재프레임사이에 흐른 시간을 내보냅니다.";
+        textMesh.text = Time.deltaTime.ToString();
     }
 }

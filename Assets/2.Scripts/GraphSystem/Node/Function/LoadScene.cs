@@ -1,27 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class LoadScene : ActivatableNode, IExpandableDisplay
+public class LoadScene : ActivatableNode
 {
-    private TextMesh myTextMesh;
     public ActiveOutputModule active_output;
-
     //values
     string value = null;
-
-
-    public void NormalDisplay()
-    {
-        if (myTextMesh != null)
-            myTextMesh.text = "LoadScene";
-    }
-    public void ExpandDisplay()
-    {
-        if (myTextMesh != null)
-        {
-            myTextMesh.text = "LoadScene" + (value != null ? ("\n" + value) : "");
-        }
-    }
 
     public void Input(string input, int index = 0)
     {
@@ -32,30 +16,9 @@ public class LoadScene : ActivatableNode, IExpandableDisplay
         }
     }
 
-    public override void Active()
-    {
-        base.Active();
-        CheckOutput();
-    }
-    public override void Awake()
-    {
-        base.Awake();
-        myTextMesh = GetComponentInChildren<TextMesh>();
-    }
-
     public override void Update()
     {
         base.Update();
-
-        if (isActive >= 1)
-        {
-            //CheckOutput();
-            isActive--;
-        }
-        if (isExpanded)
-            ExpandDisplay();
-        else
-            NormalDisplay();
         value = null;
     }
     public override void CheckOutput()
@@ -67,9 +30,11 @@ public class LoadScene : ActivatableNode, IExpandableDisplay
             isActive--;
         }
     }
-    public bool isExpanded { get; set; }
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "입력된 씬이름의 씬을 로드합니다.";
+        if (textMesh != null)
+        {
+            textMesh.text = $"{nodeName}\n{value ?? "값없음"}";
+        }
     }
 }

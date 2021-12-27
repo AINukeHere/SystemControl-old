@@ -27,12 +27,6 @@ public class SetAvoiderX : SetVariable<float?>
             float_output.Input(temp.x);
             active_output.Active();
             isActive--;
-
-            value = null;
         }
-    }
-    public override string GetInfoString()
-    {
-        return "입력된 실수값으로 Avoider의 x값 좌표를 새로 설정합니다.";
     }
 }

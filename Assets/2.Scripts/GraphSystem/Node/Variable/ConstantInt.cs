@@ -9,29 +9,15 @@ public class ConstantInt : GetVariable
     private int value;
     [SerializeField]
     private bool HasValue = true;
-
-    private TextMesh myTextMesh;
     [SerializeField]
     private IntOutputModule intOutputModule;
     //소수점 2자리까지만 출력
-    public override void Awake()
-    {
-        base.Awake();
-        myTextMesh = GetComponentInChildren<TextMesh>();
-        if (myTextMesh != null)
-        {
-            if (HasValue)
-                myTextMesh.text = value.ToString();
-            else
-                myTextMesh.text = "NULL";
-        }
-    }
     public override void CheckOutput()
     {
         intOutputModule.Input(value);
     }
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "정수값입니다. 상수이므로 절대 변경되지 않습니다.";
+        textMesh.text = value.ToString();
     }
 }

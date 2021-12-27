@@ -18,8 +18,8 @@ public class GetGameCameraPos : GetVariable
     {
         vector3_output.Input(cameraTr.position);
     }
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "게임을 비추고 있는 카메라의 좌표를 벡터3로 내보냅니다.";
+        textMesh.text = cameraTr.position.ToString();
     }
 }

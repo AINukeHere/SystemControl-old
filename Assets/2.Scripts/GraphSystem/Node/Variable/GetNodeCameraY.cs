@@ -18,8 +18,8 @@ public class GetNodeCameraY :GetVariable
     {
         float_output.Input(cameraTr.position.y);
     }
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "노드를 비추고있는 카메라의 Y좌표를 내보냅니다.";
+        textMesh.text = cameraTr.position.y.ToString();
     }
 }

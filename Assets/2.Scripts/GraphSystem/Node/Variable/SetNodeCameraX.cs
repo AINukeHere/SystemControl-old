@@ -24,12 +24,6 @@ public class SetNodeCameraX : SetVariable<float?>
             float_output.Input(temp.x);
             active_output.Active();
             isActive--;
-
-            value = null;
         }
-    }
-    public override string GetInfoString()
-    {
-        return "입력된 실수값으로 노드를 비추고 있는 카메라의 x좌표를 새로 설정합니다.";
     }
 }

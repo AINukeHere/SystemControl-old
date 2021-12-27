@@ -24,11 +24,6 @@ public class SetAvoiderGravityScale : SetVariable<float?>
             float_output.Input(AvoiderRigid.gravityScale);
             active_output.Active();
             isActive--;
-            value = null;
         }
-    }
-    public override string GetInfoString()
-    {
-        return "입력된 실수로 Avoider의 중력크기를 새로 설정합니다.";
     }
 }

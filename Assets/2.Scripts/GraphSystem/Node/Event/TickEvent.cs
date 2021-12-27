@@ -10,8 +10,8 @@ public class TickEvent : Event
         Active();
         active_output.Active();
     }
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "매 프레임마다 실행신호를 내보냅니다.";
+        NormalDisplay();
     }
 }

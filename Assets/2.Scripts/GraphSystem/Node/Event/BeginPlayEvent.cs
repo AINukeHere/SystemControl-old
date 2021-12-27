@@ -9,8 +9,8 @@ public class BeginPlayEvent : Event
         Active();
         active_output.Active();
     }
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "맨 처음 한번만 실행신호를 내보냅니다.";
+        NormalDisplay();
     }
 }

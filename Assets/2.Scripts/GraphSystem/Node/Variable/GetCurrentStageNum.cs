@@ -12,8 +12,8 @@ public class GetCurrentStageNum : GetVariable
     {
         int_output.Input(AvoidGameManager.instance?.GetCurrentStageNum(gameObject));
     }
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "현재 스테이지 값을 내보냅니다.";
+        textMesh.text = AvoidGameManager.instance?.GetCurrentStageNum(gameObject).ToString();
     }
 }

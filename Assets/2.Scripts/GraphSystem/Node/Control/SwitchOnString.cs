@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class SwitchOnString : ActivatableNode
 { 
-    private TextMesh myTextMesh;
-
     [SerializeField]
     private GameObject StringCasePrefab;
 
@@ -18,7 +16,6 @@ public class SwitchOnString : ActivatableNode
     public override void Awake()
     {
         base.Awake();
-        myTextMesh = GetComponentInChildren<TextMesh>();
 		for(int i =0; i < cases.Count; ++i)
 		{
 			cases [i].SetSwitchHead (this);
@@ -36,7 +33,7 @@ public class SwitchOnString : ActivatableNode
         {
             isActive--;
         }
-
+#if UNITY_EDITOR
         if (testBollean)
         {
             AddCase();
@@ -47,12 +44,11 @@ public class SwitchOnString : ActivatableNode
             DeleteCase();
             testBollean2 = false;
         }
-
+#endif
     }
     public override void Active()
     {
         base.Active();
-        CheckOutput();
         for (int i = 0; i < cases.Count; ++i)
             cases[i].Active();
     }
@@ -112,8 +108,9 @@ public class SwitchOnString : ActivatableNode
             cases.RemoveAt(cases.Count - 1);
         }
     }
-    public override string GetInfoString()
+
+    public override void ExpandDisplay()
     {
-        return "입력된 문장을 보고 같은 문장이 있으면 해당 문장의 바로 우측으로 실행신호를 보내고 하나도 매칭이 안된다면 맨 상단으로 내보냅니다.";
+        textMesh.text = input_value;
     }
 }

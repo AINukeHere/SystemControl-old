@@ -14,8 +14,8 @@ public class GetHorizontalInput : GetVariable
             Debug.Log("GetHorizontalInput CheckOutput()");
         float_output.Input(Input.GetAxisRaw("Horizontal"));
     }
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "플레이어의 좌/우 키에 대한 입력값을 내보냅니다. (-1또는 0 또는 1)";
+        textMesh.text = Input.GetAxisRaw("Horizontal").ToString();
     }
 }

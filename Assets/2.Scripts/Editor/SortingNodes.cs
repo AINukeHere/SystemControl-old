@@ -53,7 +53,13 @@ public class SortingNodes : Editor
                     spriteMask.frontSortingOrder = ++nodeOrder;
                     Debug.Log(node.gameObject.name + "'s " + spriteMask.gameObject.name + " = " + nodeOrder);
 
-                    spriteRenderersInMasksChildren.AddRange(spriteMask.GetComponentsInChildren<SpriteRenderer>());
+                    var masks = spriteMask.GetComponentsInChildren<SpriteRenderer>();
+                    foreach(var mask in masks)
+                    {
+                        if (mask.gameObject.Equals(spriteMask.gameObject))
+                            continue;
+                        spriteRenderersInMasksChildren.Add(mask);
+                    }
                 }
                 foreach (SpriteRenderer spriteRenderer in spriteRenderersInMasksChildren)
                 {

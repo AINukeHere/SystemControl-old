@@ -22,12 +22,6 @@ public class SetGameCameraPos : SetVariable<Vector3?>
             vector3_output.Input(value.Value);
             active_output.Active();
             isActive--;
-
-            value = null;
         }
-    }
-    public override string GetInfoString()
-    {
-        return "입력된 벡터3로 게임을 비추고 있는 카메라의 위치를 새로 설정합니다.";
     }
 }

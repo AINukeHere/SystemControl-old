@@ -6,23 +6,23 @@ public class GetAvoiderVelocity : GetVariable
 {
     [SerializeField]
     private Vector2OutputModule vector2_output;
-    private Rigidbody2D AvoiderRigid2D;
+    private Rigidbody2D avoiderRigid2D;
 
     public override void Awake()
     {
         base.Awake();
         GameObject avoider = GameObject.FindGameObjectWithTag("Avoider");
         if (avoider != null)
-            AvoiderRigid2D = avoider.GetComponent<Rigidbody2D>();
+            avoiderRigid2D = avoider.GetComponent<Rigidbody2D>();
     }
     public override void CheckOutput()
     {
         if (gameObject.name.EndsWith("(Test)"))
-            Debug.Log("GetAvoiderVelocity CheckOutput() : "+AvoiderRigid2D.velocity);
-        vector2_output.Input(AvoiderRigid2D.velocity);
+            Debug.Log("GetAvoiderVelocity CheckOutput() : "+avoiderRigid2D.velocity);
+        vector2_output.Input(avoiderRigid2D.velocity);
     }
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "Avoider의 현재 속도(방향이 있는 값)를 벡터2로 내보냅니다.";
+        textMesh.text = avoiderRigid2D.velocity.ToString();
     }
 }

@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class BreakVector3 : Operator<Vector3?,float?>
 {
-    public override void SetDefaultText()
-    {
-        textMesh.text = "Break Vector3";
-    }
     public override void CheckOutput()
     {
         if (input[0] != null)
@@ -20,9 +16,5 @@ public class BreakVector3 : Operator<Vector3?,float?>
             output[2].Input(result[2]);
             input[0] = null;
         }
-    }
-    public override string GetInfoString()
-    {
-        return "입력된 벡터3를 스칼라값(실수) 셋으로 쪼개서 각각 내보냅니다.";
     }
 }

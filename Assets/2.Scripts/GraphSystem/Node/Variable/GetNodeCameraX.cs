@@ -18,8 +18,8 @@ public class GetNodeCameraX : GetVariable
     {
         float_output.Input(cameraTr.position.x);
     }
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "노드를 비추고있는 카메라의 X좌표를 내보냅니다.";
+        textMesh.text = cameraTr.position.x.ToString();
     }
 }

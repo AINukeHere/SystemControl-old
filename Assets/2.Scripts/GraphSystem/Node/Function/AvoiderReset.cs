@@ -2,31 +2,13 @@
 
 public class AvoiderReset : ActivatableNode
 {
-    private TextMesh myTextMesh;
     private Transform avoiderTr;
 
     public ActiveOutputModule active_output;
-
-    public override void Active()
-    {
-        base.Active();
-        CheckOutput();
-    }
     public override void Awake()
     {
         base.Awake();
-        myTextMesh = GetComponentInChildren<TextMesh>();
         avoiderTr = GameObject.FindGameObjectWithTag("Avoider").transform;
-    }
-
-    public override void Update()
-    {
-        base.Update();
-        if (isActive >= 1)
-        {
-            //CheckOutput();
-            isActive--;
-        }
     }
     public override void CheckOutput()
     {
@@ -40,8 +22,8 @@ public class AvoiderReset : ActivatableNode
         }
     }
 
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "Avoider의 위치, 크기, 속도를 초기화시킵니다.";
+        NormalDisplay();
     }
 }

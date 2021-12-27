@@ -6,21 +6,21 @@ public class GetAvoiderY : GetVariable
 {
     [SerializeField]
     private FloatOutputModule float_output;
-    private Transform AvoiderTr;
+    private Transform avoiderTr;
 
     public override void Awake()
     {
         base.Awake();
         GameObject avoider = GameObject.FindGameObjectWithTag("Avoider");
         if (avoider != null)
-            AvoiderTr = avoider.GetComponent<Transform>();
+            avoiderTr = avoider.GetComponent<Transform>();
     }
     public override void CheckOutput()
     {
-        float_output.Input(AvoiderTr.localPosition.y);
+        float_output.Input(avoiderTr.localPosition.y);
     }
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "Avoider의 y좌표를 내보냅니다.";
+        textMesh.text = avoiderTr.localPosition.y.ToString();
     }
 }

@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class MakeVector3 : Operator<float?,Vector3?>
 {
-    public override void SetDefaultText()
-    {
-        textMesh.text = "Make Vector3";
-    }
     public override void CheckOutput()
     {
         if (input[0] != null && input[1] != null && input[2] != null)
@@ -18,9 +14,5 @@ public class MakeVector3 : Operator<float?,Vector3?>
             input[1] = null;
             input[2] = null;
         }
-    }
-    public override string GetInfoString()
-    {
-        return "입력된 세 실수값으로 벡터3를 만들어 내보냅니다.";
     }
 }

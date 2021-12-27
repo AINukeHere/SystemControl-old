@@ -25,11 +25,6 @@ public class SetAvoiderScale : SetVariable<Vector2?>
             vector2_output.Input(AvoiderTr.localScale);
             active_output.Active();
             isActive--;
-            value = null;
         }
-    }
-    public override string GetInfoString()
-    {
-        return "입력된 벡터2로 Avoider의 크기값을 새로 설정합니다.";
     }
 }

@@ -65,18 +65,29 @@ public interface IExpandableDisplay
     void ExpandDisplay();
 }
 //모든 노드가 상속받는 클래스입니다.
-public abstract class Node : MonoBehaviour, IResetable, IHasInfo, IMovable
+public abstract class Node : MonoBehaviour, IResetable, IHasInfo, IMovable, IExpandableDisplay
 {
+    protected TextMesh textMesh;
+    protected string nodeName;
     public Vector3 origin_pos{get; set;}
     public Quaternion origin_rot{get; set;}
     //input, output module의 transform for update to connected Edge
     protected List<Transform> allInputModules;
     public virtual void Awake()
     {
+        nodeName = NodeManager.instance.getNormalDisplayText(GetType());
+        textMesh = GetComponentInChildren<TextMesh>();
         origin_pos = transform.position;
         origin_rot = transform.rotation;
         allInputModules = new List<Transform>();
         CheckAllModules();
+    }
+    public virtual void Update()
+    {
+        if (isExpanded)
+            ExpandDisplay();
+        else
+            NormalDisplay();
     }
     public virtual void CheckAllModules()
     {
@@ -124,10 +135,14 @@ public abstract class Node : MonoBehaviour, IResetable, IHasInfo, IMovable
     }
 
     public abstract void CheckOutput();
-    public abstract string GetInfoString();
+    public string GetInfoString()
+    {
+        return NodeManager.instance.getExplainText(this.GetType());
+    }
 
     //Movable 인터페이스 구현
     public bool isMoving { get; set; }
+
     public virtual void Move(Vector2 pos, bool bGroup = false)
     {
         Collider2D[] colls = Physics2D.OverlapAreaAll((Vector3)pos - transform.lossyScale, (Vector3)pos + transform.lossyScale);
@@ -140,6 +155,15 @@ public abstract class Node : MonoBehaviour, IResetable, IHasInfo, IMovable
         EdgeManager.instance.onNodeMoving(allInputModules, transform);
     }
     public virtual void MoveEnd(Vector2 pos, bool bGroup = false) { }
+
+    //ExpandableDisplay 인터페이스 구현
+    public bool isExpanded { get; set; }
+    public virtual void NormalDisplay()
+    {
+        if (textMesh != null)
+            textMesh.text = nodeName;
+    }
+    public abstract void ExpandDisplay();
 }
 //활성화가능한(실행 가능한) 노드클래스 = 함수노드, 제어노드, SetVariable
 public abstract class ActivatableNode : Node
@@ -154,17 +178,22 @@ public abstract class ActivatableNode : Node
         {
             TutorialManager.instance.NodeActivated(gameObject.name);
         }
+        CheckOutput();
     }
     public override void Awake()
     {
         base.Awake();
         myRenderer = GetComponent<SpriteRenderer>();
     }
-    public virtual void Update()
+    public override void Update()
     {
+        base.Update();
         Color temp = myRenderer.color;
         if (isActive >= 1)
+        {
             temp.a = 1;
+            isActive--;
+        }
         else
             temp.a = 0.5f;
         myRenderer.color = temp;
@@ -172,7 +201,7 @@ public abstract class ActivatableNode : Node
 
 }
 //연산자 노드가 아닌 실행신호가 없는 노드클래스 = Object에 대한 Method node (ex. isPlayingAudioSource, PlayAudioSource)
-public abstract class MethodNode : Node, IExpandableDisplay
+public abstract class MethodNode : Node
 {
     protected SpriteRenderer myRenderer;
     public abstract bool CheckRuningState();
@@ -181,25 +210,16 @@ public abstract class MethodNode : Node, IExpandableDisplay
         base.Awake();
         myRenderer = GetComponent<SpriteRenderer>();
     }
-    public virtual void Update()
+    public override void Update()
     {
+        base.Update();
         Color temp = myRenderer.color;
         if (CheckRuningState())
             temp.a = 1;
         else
             temp.a = 0.5f;
         myRenderer.color = temp;
-
-        //IExpandableDisplay
-        if (isExpanded)
-            ExpandDisplay();
-        else
-            NormalDisplay();
     }
-    //IExpandableDisplay 구현
-    public bool isExpanded { get; set; }
-    public abstract void NormalDisplay();
-    public abstract void ExpandDisplay();
 
 }
 //ArrowOutput이 Active시키지 않고 노드가 아닌 활성화클래스 (SwitchCase, Folder)
@@ -232,9 +252,8 @@ public class NotInputNotNodeActivatable : MonoBehaviour
 /// </summary>
 /// <typeparam name="T"></typeparam>
 /// <typeparam name="R"></typeparam>
-public abstract class Operator<T, R> : Node, IExpandableDisplay
+public abstract class Operator<T, R> : Node
 {
-    protected TextMesh textMesh;
     //인풋모듈에서 어싸인
     public int input_size = 0, result_size = 0;
     protected T[] input;
@@ -249,25 +268,25 @@ public abstract class Operator<T, R> : Node, IExpandableDisplay
         base.Awake();
         input = new T[input_size];
         result = new R[result_size];
-        textMesh = GetComponentInChildren<TextMesh>();
         output = GetComponentsInChildren<OutputModule<R>>();
         if (output == null)
             Debug.LogError("RelationalOperator can't find output module");
     }
-    public virtual void Update()
+    public override void Update()
     {
-        if (isExpanded)
-            ExpandDisplay();
-        else
-            NormalDisplay();
+        base.Update();
         if (gameObject.name.EndsWith("(Test)"))
             Debug.Log("Operator default(T)");
         for (int i = 0; i < input.Length; ++i)
         {
             input[i] = default;
         }
+        for (int i = 0; i < result.Length; ++i)
+        {
+            result[i] = default;
+        }
     }
-    public abstract void SetDefaultText();
+    
 
 
     public void Input(T input, int idx)
@@ -282,29 +301,20 @@ public abstract class Operator<T, R> : Node, IExpandableDisplay
     }
 
 
-    public virtual void NormalDisplay()
-    {
-        if (textMesh != null)
-            SetDefaultText();
-    }
-    public virtual void ExpandDisplay()
+    public override void ExpandDisplay()
     {
         if (textMesh != null)
         {
-            SetDefaultText();
             if (result != null)
             {
+                textMesh.text = nodeName;
                 foreach (R r in result)
                 {
-                    if (r != null)
-                        textMesh.text += ("\n" + r.ToString());
-                    else
-                        textMesh.text += "\n값없음";
+                    textMesh.text = $"{nodeName}\n{(r != null ? r.ToString() : "값없음")}";
                 }
             }
         }
     }
-    public bool isExpanded { get; set; }
 }
 
 /*
@@ -516,6 +526,7 @@ public abstract class OutputModule<T> : ModuleColorize, IInputParam<T>, IMovable
 public abstract class GetVariable : Node
 {
     private bool bCheckOutput = false;
+
     public override void Awake()
     {
         base.Awake();
@@ -528,8 +539,9 @@ public abstract class GetVariable : Node
 #endif
         CheckOutput();
     }
-    public virtual void Update()
+    public override void Update()
     {
+        base.Update();
 #if UNITY_EDITOR
         if (gameObject.name.EndsWith("(Test)"))
             Debug.Log("GetVariable CheckOutput()");
@@ -572,13 +584,12 @@ public abstract class SetVariable<T> : ActivatableNode, IInputParam<T>
     public override void Update()
     {
         base.Update();
-        if (isActive >= 1)
-        {
-            //CheckOutput();
-            isActive--;
-        }
         value = default(T);
-        isActive = 0;
+    }
+    public override void ExpandDisplay()
+    {
+        //textMesh.text = $"{nodeName}\n{value.ToString()}";
+        textMesh.text = $"{nodeName}\n{(value.Equals(default(T)) ? "값없음" : value.ToString())}";
     }
 }
 
@@ -597,11 +608,15 @@ public abstract class Event : Node
         base.Awake();
         myRenderer = GetComponent<SpriteRenderer>();
     }
-    public virtual void Update()
+    public override void Update()
     {
+        base.Update();
         Color temp = myRenderer.color;
         if (isActive >= 1)
+        {
+            isActive--;
             temp.a = 1;
+        }
         else
             temp.a = 0.5f;
         myRenderer.color = temp;

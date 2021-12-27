@@ -10,8 +10,8 @@ public class GetVerticalInput : GetVariable
     {
         float_output.Input(Input.GetAxisRaw("Vertical"));
     }
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "플레이어의 상/하 키에 대한 입력값을 내보냅니다. (-1또는 0 또는 1)";
+        textMesh.text = Input.GetAxisRaw("Vertical").ToString();
     }
 }

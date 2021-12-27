@@ -31,6 +31,7 @@ public class UI_FrameHighlighting : MonoBehaviour
 	private float timeLine = 1.0f;
 
 
+    private RectTransform frameRootTr;
     //타겟의 픽셀 퍼 유닛
     float targetPixelPerUnit;
     float myPixelPerUnit;
@@ -38,6 +39,7 @@ public class UI_FrameHighlighting : MonoBehaviour
 
     void OnEnable()
     {
+        frameRootTr = GetComponent<RectTransform>();
         UpFrame.GetComponent<Image>().color = frameColor;
         DownFrame.GetComponent<Image>().color = frameColor;
         LeftFrame.GetComponent<Image>().color = frameColor;
@@ -96,40 +98,71 @@ public class UI_FrameHighlighting : MonoBehaviour
     {
         if (targetTr != null)
         {
-            float yScale = targetTr.rect.height * 0.5f;
-            float xScale = targetTr.rect.width * 0.5f;
-            //겹치지 않고 둘러싸는 스타일
-            if (!bOverlap)
+            frameRootTr.anchorMin = targetTr.anchorMin;
+            frameRootTr.anchorMax = targetTr.anchorMax;
+            frameRootTr.position = targetTr.position;
+            frameRootTr.localScale = targetTr.lossyScale;
+            frameRootTr.sizeDelta = targetTr.sizeDelta;
+
+            //겹치면서 둘러싸는 스타일
+            if (bOverlap)
             {
-                //위치 : 타겟위치 + 타겟y스케일 + 프레임두깨*0.5
-				UpFrame.position = targetTr.position + (yScale * aspratio * aspratio + frameWidth*0.5f) * targetTr.up;
-                UpFrame.sizeDelta = new Vector2(targetTr.rect.width * aspratio * aspratio + frameWidth*2, frameWidth);
+                UpFrame.sizeDelta = new Vector2(0, frameWidth);
+                DownFrame.sizeDelta = new Vector2(0, frameWidth);
+                LeftFrame.sizeDelta = new Vector2(frameWidth, 0);
+                RightFrame.sizeDelta = new Vector2(frameWidth, 0);
 
-				DownFrame.position = targetTr.position - (yScale * aspratio * aspratio + frameWidth*0.5f) * targetTr.up;
-                DownFrame.sizeDelta = new Vector2(targetTr.rect.width * aspratio * aspratio + frameWidth*2, frameWidth);
-
-				LeftFrame.position = targetTr.position - (xScale * aspratio * aspratio + frameWidth*0.5f) * targetTr.right;
-                LeftFrame.sizeDelta = new Vector2(frameWidth, targetTr.rect.height * aspratio * aspratio + frameWidth*2);
-
-				RightFrame.position = targetTr.position + (xScale * aspratio * aspratio + frameWidth*0.5f) * targetTr.right;
-                RightFrame.sizeDelta = new Vector2(frameWidth, targetTr.rect.height * aspratio * aspratio + frameWidth*2);
+                UpFrame.anchoredPosition = new Vector2(UpFrame.anchoredPosition.x, 0);
+                DownFrame.anchoredPosition = new Vector2(DownFrame.anchoredPosition.x, 0);
+                LeftFrame.anchoredPosition = new Vector2(0, LeftFrame.anchoredPosition.y);
+                RightFrame.anchoredPosition = new Vector2(0, RightFrame.anchoredPosition.y);
             }
             else
             {
-                //위치 : 타겟위치 + 타겟y스케일 + 프레임두깨*0.5
-				UpFrame.position = (targetTr.position + (yScale * aspratio * aspratio - frameWidth * 0.5f) * targetTr.up);
-                UpFrame.sizeDelta = new Vector2(targetTr.rect.width, frameWidth);
+                UpFrame.sizeDelta = new Vector2(frameWidth * 2, frameWidth);
+                DownFrame.sizeDelta = new Vector2(frameWidth * 2, frameWidth);
+                LeftFrame.sizeDelta = new Vector2(frameWidth, frameWidth * 2);
+                RightFrame.sizeDelta = new Vector2(frameWidth, frameWidth * 2);
 
-				DownFrame.position = (targetTr.position - (yScale * aspratio * aspratio - frameWidth * 0.5f) * targetTr.up);
-                DownFrame.sizeDelta = new Vector2(targetTr.rect.width, frameWidth);
+                UpFrame.anchoredPosition = new Vector2(UpFrame.anchoredPosition.x, frameWidth);
+                DownFrame.anchoredPosition = new Vector2(DownFrame.anchoredPosition.x, -frameWidth);
+                LeftFrame.anchoredPosition = new Vector2(-frameWidth, LeftFrame.anchoredPosition.y);
+                RightFrame.anchoredPosition = new Vector2(frameWidth, RightFrame.anchoredPosition.y);
+            }
+            //         float yScale = targetTr.rect.height;// * 0.5f;
+            //         float xScale = targetTr.rect.width;// * 0.5f;
+            //         //겹치지 않고 둘러싸는 스타일
+            //         if (!bOverlap)
+            //         {
+            //             //위치 : 타겟위치 + 타겟y스케일 + 프레임두깨*0.5
+            //	UpFrame.position = targetTr.position + (yScale * aspratio * aspratio + frameWidth*0.5f) * targetTr.up;
+            //             UpFrame.sizeDelta = new Vector2(targetTr.rect.width * aspratio * aspratio + frameWidth*2, frameWidth);
 
-				LeftFrame.position = (targetTr.position - (xScale * aspratio * aspratio - frameWidth * 0.5f) * targetTr.right);
-                LeftFrame.sizeDelta = new Vector2(frameWidth, targetTr.rect.height);
+            //	DownFrame.position = targetTr.position - (yScale * aspratio * aspratio + frameWidth*0.5f) * targetTr.up;
+            //             DownFrame.sizeDelta = new Vector2(targetTr.rect.width * aspratio * aspratio + frameWidth*2, frameWidth);
 
-				RightFrame.position = (targetTr.position + (xScale * aspratio * aspratio - frameWidth * 0.5f) * targetTr.right);
-                RightFrame.sizeDelta = new Vector2(frameWidth, targetTr.rect.height);
-			}
-			UpFrame.rotation = DownFrame.rotation = LeftFrame.rotation = RightFrame.rotation = targetTr.rotation;
+            //	LeftFrame.position = targetTr.position - (xScale * aspratio * aspratio + frameWidth*0.5f) * targetTr.right;
+            //             LeftFrame.sizeDelta = new Vector2(frameWidth, targetTr.rect.height * aspratio * aspratio + frameWidth*2);
+
+            //	RightFrame.position = targetTr.position + (xScale * aspratio * aspratio + frameWidth*0.5f) * targetTr.right;
+            //             RightFrame.sizeDelta = new Vector2(frameWidth, targetTr.rect.height * aspratio * aspratio + frameWidth*2);
+            //         }
+            //         else
+            //         {
+            //             //위치 : 타겟위치 + 타겟y스케일 + 프레임두깨*0.5
+            //	UpFrame.position = (targetTr.position + ((yScale*0.5f * aspratio) - (frameWidth * 0.5f)) * targetTr.up);
+            //             UpFrame.sizeDelta = new Vector2(targetTr.rect.width, frameWidth);
+
+            //	DownFrame.position = (targetTr.position + (yScale*0.5f * aspratio - frameWidth * 0.5f) * targetTr.up);
+            //             DownFrame.sizeDelta = new Vector2(targetTr.rect.width, frameWidth);
+
+            //	LeftFrame.position = (targetTr.position - (xScale * aspratio * aspratio - frameWidth * 0.5f) * targetTr.right);
+            //             LeftFrame.sizeDelta = new Vector2(frameWidth, targetTr.rect.height);
+
+            //	RightFrame.position = (targetTr.position + (xScale * aspratio * aspratio - frameWidth * 0.5f) * targetTr.right);
+            //             RightFrame.sizeDelta = new Vector2(frameWidth, targetTr.rect.height);
+            //}
+            //UpFrame.rotation = DownFrame.rotation = LeftFrame.rotation = RightFrame.rotation = targetTr.rotation;
         }
     }
 }

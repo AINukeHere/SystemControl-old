@@ -6,22 +6,22 @@ public class GetAvoiderScale : GetVariable
 {
     [SerializeField]
     private Vector2OutputModule vector2_output;
-    private Transform AvoiderTr;
+    private Transform avoiderTr;
 
     public override void Awake()
     {
         base.Awake();
         GameObject avoider = GameObject.FindGameObjectWithTag("Avoider");
         if (avoider != null)
-            AvoiderTr = avoider.GetComponent<Transform>();
+            avoiderTr = avoider.GetComponent<Transform>();
     }
 
     public override void CheckOutput()
     {
-        vector2_output.Input(AvoiderTr.localScale);
+        vector2_output.Input(avoiderTr.localScale);
     }
-    public override string GetInfoString()
+    public override void ExpandDisplay()
     {
-        return "Avoider의 크기를 벡터2로 내보냅니다.";
+        textMesh.text = ((Vector2)avoiderTr.localScale).ToString();
     }
 }
